@@ -2,14 +2,19 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.common.api.ApiException
@@ -29,7 +34,7 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 
-class SelectLocationFragment : BaseFragment() {
+class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
 
     private val REQUEST_CODE_BACKGROUND = 102929
     private val REQUEST_TURN_DEVICE_LOCATION_ON = 12433
@@ -109,5 +114,148 @@ class SelectLocationFragment : BaseFragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
+    override fun onMapReady(googleMap: GoogleMap?) {
+        mMap = googleMap!!
+
+        setPoiClick(mMap)
+        setMapStyle(mMap)
+        enableMyLocation()
+    }
+
+    private fun setPoiClick(map: GoogleMap) {
+        map.setOnPoiClickListener { poi ->
+            val poiMarker = map.addMarker(
+                MarkerOptions()
+                    .position(poi.latLng)
+                    .title(poi.name)
+            )
+            val zoomLevel = 15f
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, zoomLevel))
+            poiMarker?.showInfoWindow()
+            Poi = poi
+            lat= poi.latLng.latitude
+            long = poi.latLng.longitude
+            title = poi.name
+        }
+        isLocationSelected=true
+    }
+
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            // Customize the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = map.setMapStyle(
+                context?.let {
+                    MapStyleOptions.loadRawResourceStyle(
+                        it,
+                        R.raw.map_style
+                    )
+                }
+            )
+
+            if (!success) {
+                Toast.makeText(context,"Style parsing failed.", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Resources.NotFoundException) {
+            Toast.makeText(context, "error $e", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+    private fun isPermissionGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_BACKGROUND) {
+            checkDeviceLocationSettings()
+        }
+    }
+
+    private fun checkDeviceLocationSettings(resolve: Boolean = true) {
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+        val requestBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val locationSettingsResponseTask =
+            settingsClient.checkLocationSettings(requestBuilder.build())
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException && resolve) {
+                try {
+                    exception.startResolutionForResult(
+                        requireActivity(),
+                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    )
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
+                }
+            } else {
+                Snackbar.make(
+                    requireView(),
+                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                ).setAction(android.R.string.ok) {
+                    checkDeviceLocationSettings()
+                }.show()
+            }
+
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun enableMyLocation() {
+        if (isPermissionGranted()) {
+            mMap.isMyLocationEnabled = true
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                checkDeviceLocationSettings()
+            } else {
+                requestQPermission()
+            }
+
+        } else {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
+        }
+        //        DONE: zoom to the user location after taking his permission
+
+
+        mMap.moveCamera(CameraUpdateFactory.zoomIn())
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    private fun requestQPermission() {
+        val hasForegroundPermission = ActivityCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasForegroundPermission) {
+            val hasBackgroundPermission = ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+            if (hasBackgroundPermission) {
+                checkDeviceLocationSettings()
+            } else {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                    REQUEST_CODE_BACKGROUND
+                )
+            }
+        }
+    }
 
 }

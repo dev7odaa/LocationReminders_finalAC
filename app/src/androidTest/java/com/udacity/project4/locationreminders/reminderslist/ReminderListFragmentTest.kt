@@ -146,4 +146,28 @@ class ReminderListFragmentTest {
             .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(reminder2.description))))
             .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(reminder2.location))))
     }
+
+    /**
+     * Add testing for the error messages.
+     */
+    @Test
+    fun remindersList_displayNoData() {
+        // GIVEN an empty reminders list
+        runBlocking {
+            dataSource.deleteAllReminders()
+        }
+
+        // WHEN on the reminder list screen
+        launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
+
+        // THEN "No Data" is displayed on the screen
+        onView(withId(R.id.noDataTextView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(withId(R.id.noDataTextView)).check(
+            ViewAssertions.matches(
+                ViewMatchers.withText(
+                    appContext.getString(R.string.no_data)
+                )
+            )
+        )
+    }
 }

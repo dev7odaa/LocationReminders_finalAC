@@ -104,7 +104,7 @@ class RemindersListViewModelTest {
         // WHEN request reminders from data source
         remindersListViewModel.loadReminders()
 
-        // check showSnackBar value is Returning testing error!
+        // Assert show snackbar value is Returning testing error
         MatcherAssert.assertThat(
             remindersListViewModel.showSnackBar.getOrAwaitValue(),
             CoreMatchers.`is`("Returning testing error!")

@@ -59,11 +59,14 @@ class RemindersListViewModelTest {
         // WHEN request reminders from data source
         remindersListViewModel.loadReminders()
 
-        // THEN reminders are loaded
+
+        // show that remindersList is not empty
         MatcherAssert.assertThat(
             remindersListViewModel.remindersList.getOrAwaitValue().isNotEmpty(),
             CoreMatchers.`is`(true)
         )
+
+        // show that showNoData is false
         MatcherAssert.assertThat(
             remindersListViewModel.showNoData.getOrAwaitValue(),
             CoreMatchers.`is`(false)
@@ -79,11 +82,13 @@ class RemindersListViewModelTest {
         // WHEN request reminders from data source
         remindersListViewModel.loadReminders()
 
-        // THEN show no data
+        // show that remindersList is empty
         MatcherAssert.assertThat(
             remindersListViewModel.remindersList.getOrAwaitValue().isEmpty(),
             CoreMatchers.`is`(true)
         )
+
+        // show that showNoData is true
         MatcherAssert.assertThat(
             remindersListViewModel.showNoData.getOrAwaitValue(),
             CoreMatchers.`is`(true)
@@ -92,13 +97,14 @@ class RemindersListViewModelTest {
 
     @Test
     fun loadReminders_returnError() = mainCoroutineRule.runBlockingTest {
-        // GIVEN fake data without any reminders
+
+        // assure that data source return error or not
         dataSource.setReturnError(true)
 
         // WHEN request reminders from data source
         remindersListViewModel.loadReminders()
 
-        // THEN show no data
+        // show that showSnackBar value is Returning testing error!
         MatcherAssert.assertThat(
             remindersListViewModel.showSnackBar.getOrAwaitValue(),
             CoreMatchers.`is`("Returning testing error!")

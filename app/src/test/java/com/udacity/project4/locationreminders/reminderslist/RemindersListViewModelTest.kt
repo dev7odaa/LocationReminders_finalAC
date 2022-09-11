@@ -51,7 +51,7 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_listNotEmpty() = mainCoroutineRule.runBlockingTest {
 
-        // GIVEN reminders list
+        // GIVEN empty reminders list
         dataSource.deleteAllReminders()
         val reminder = ReminderDTO("Title", "Description", "Location", 1.1, 2.2)
         dataSource.saveReminder(reminder)
@@ -92,7 +92,7 @@ class RemindersListViewModelTest {
 
     @Test
     fun loadReminders_returnError() = mainCoroutineRule.runBlockingTest {
-        // GIVEN empty reminders list
+        // GIVEN fake data without any reminders
         dataSource.setReturnError(true)
 
         // WHEN request reminders from data source

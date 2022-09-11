@@ -81,11 +81,13 @@ class RemindersDaoTest {
         // GIVEN a list of 3 reminders
         saveReminders()
 
-        // WHEN reminders are requested from database
+        // request reminders from database sortedBy id
         var reminders = remindersDao.getReminders().sortedBy { it.id }
 
-        // THEN reminders are loaded from database
+        // show that reminders count is 3
         assertThat(reminders.count(), `is`(3))
+
+        // show that reminders is equal localReminder list
         assertThat(reminders, IsEqual(localReminder))
     }
 
@@ -94,10 +96,10 @@ class RemindersDaoTest {
         // GIVEN an empty list of reminders
         remindersDao.deleteAllReminders()
 
-        // WHEN reminders are requested from database
+        //  request reminders from database
         var reminders = remindersDao.getReminders()
 
-        // THEN empty reminders list is loaded from database
+        // show that reminders.isEmpty is  true
         assertThat(reminders.isEmpty(), `is`(true))
     }
 
@@ -106,11 +108,13 @@ class RemindersDaoTest {
         // GIVEN a reminder
         remindersDao.saveReminder(reminder1)
 
-        // WHEN request reminder by ID from database
+        // request reminder by ID from database
         val reminder = remindersDao.getReminderById(reminder1.id)
 
-        //THEN reminder is loaded from database
+        // show that reminder is  NotNull
         assertThat<ReminderDTO>(reminder as ReminderDTO, notNullValue())
+
+        // show that reminder.id is equal  reminder1.id
         assertThat(reminder.id, `is`(reminder1.id))
     }
 
@@ -119,10 +123,10 @@ class RemindersDaoTest {
         // GIVEN a reminder
         remindersDao.saveReminder(reminder1)
 
-        // WHEN request reminder by not existing ID from database
+        // request reminder by not existing ID from database
         val reminder = remindersDao.getReminderById(UUID.randomUUID().toString())
 
-        //THEN "no" reminder is loaded from database
+        // show that reminder is null
         assertThat(reminder, `is`(CoreMatchers.nullValue()))
     }
 
@@ -132,10 +136,10 @@ class RemindersDaoTest {
         saveReminders()
         remindersDao.deleteAllReminders()
 
-        // WHEN request reminders from database
+        //  request reminders from database
         val reminders = remindersDao.getReminders()
 
-        // THEN empty reminders list is loaded from database
+        // show that reminders list is empty in database
         assertThat(reminders.isEmpty(), `is`(true))
     }
 }

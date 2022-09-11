@@ -74,7 +74,7 @@ class RemindersLocalRepositoryTest {
         remindersDao.saveReminder(reminder3)
     }
 
-    // Executes each task synchronously using Architecture Components.
+    // Executes each task synchronously.
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
@@ -96,47 +96,52 @@ class RemindersLocalRepositoryTest {
         // GIVEN a list of three reminders
         saveReminders()
 
-        // WHEN reminders are requested from the reminders repository
+        //  reminders are requested from the reminders repository
         val reminders = (remindersRepository.getReminders() as Result.Success).data.sortedBy { it.id }
 
-        // THEN reminders are loaded from local data source
+        // show that reminders is NotNull
         assertThat(reminders, CoreMatchers.notNullValue())
+
+        // show that reminders is equal reminders in local database
         assertThat(reminders, IsEqual(localReminder))
     }
 
     @Test
     fun getReminders_getZeroRemindersFromLocalDataSource() = mainCoroutineRule.runBlockingTest {
         // GIVEN an empty list of reminders
+        remindersDao.deleteAllReminders()
 
         // WHEN reminders are requested from the reminders repository
         val reminders = remindersRepository.getReminders() as Result.Success
 
-        // THEN empty reminders list is loaded from local data source
+        // show that empty reminders list is loaded from local data source is true
         assertThat(reminders.data.isEmpty(), `is`(true))
     }
 
     @Test
     fun getReminderById_getReminderByIdFromLocalDataSource() = mainCoroutineRule.runBlockingTest {
-        // GIVEN a reminder
+        // GIVEN a reminder with Id
         remindersDao.saveReminder(reminderWithId)
 
-        // WHEN request reminder by ID from the reminders repository
+        // request reminder by ID from the reminders repository
         val reminder = remindersRepository.getReminder(reminderId) as Result.Success
 
-        // THEN reminder is loaded from local data source
+        // show that reminder is loaded from local data source is NotNull
         assertThat(reminder.data, CoreMatchers.notNullValue())
+
+        // show that reminder isEqual reminder loaded from local data source
         assertThat(reminder.data, IsEqual(reminderWithId))
     }
 
     @Test
     fun getReminderById_idNotFound() = mainCoroutineRule.runBlockingTest {
-        // GIVEN a reminder
+        // GIVEN a reminder with Id
         remindersDao.saveReminder(reminderWithId)
 
-        // WHEN request reminder by not existing ID from the reminders repository
+        // request reminder by not existing ID from the reminders repository
         val reminder = remindersRepository.getReminder(UUID.randomUUID().toString()) as Result.Error
 
-        // THEN no reminder is loaded from local data source, Error is raised
+        // show that reminder message loaded from local data source is "Reminder not found!"
         assertThat(reminder.message, `is`("Reminder not found!"))
     }
 
@@ -145,11 +150,11 @@ class RemindersLocalRepositoryTest {
         // GIVEN a list of 3 reminders
         saveReminders()
 
-        // WHEN delete all reminders
+        // delete all reminders
         remindersDao.deleteAllReminders()
         val reminders = remindersRepository.getReminders() as Result.Success
 
-        // THEN zero reminders are loaded from local data source
+        // show that reminders data is Empty
         assertThat(reminders.data.isEmpty(), `is`(true))
     }
 }

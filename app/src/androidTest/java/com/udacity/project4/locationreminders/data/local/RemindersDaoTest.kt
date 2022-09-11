@@ -93,7 +93,7 @@ class RemindersDaoTest {
 
     @Test
     fun getReminders_getZeroRemindersFromDatabase() = runBlockingTest {
-        // GIVEN an empty list of reminders
+        // Delete a list of reminders
         remindersDao.deleteAllReminders()
 
         //  request reminders from database

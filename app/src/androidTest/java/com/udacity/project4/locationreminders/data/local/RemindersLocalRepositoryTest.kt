@@ -108,7 +108,7 @@ class RemindersLocalRepositoryTest {
 
     @Test
     fun getReminders_getZeroRemindersFromLocalDataSource() = mainCoroutineRule.runBlockingTest {
-        // GIVEN an empty list of reminders
+        // Delete  a list of reminders
         remindersDao.deleteAllReminders()
 
         // WHEN reminders are requested from the reminders repository

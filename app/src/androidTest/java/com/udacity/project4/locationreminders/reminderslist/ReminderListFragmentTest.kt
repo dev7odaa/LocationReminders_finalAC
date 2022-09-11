@@ -152,7 +152,7 @@ class ReminderListFragmentTest {
      */
     @Test
     fun remindersList_displayNoData() {
-        // GIVEN an empty reminders list
+        // Delete  a reminders list
         runBlocking {
             dataSource.deleteAllReminders()
         }

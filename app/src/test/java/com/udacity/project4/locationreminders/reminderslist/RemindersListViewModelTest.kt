@@ -51,7 +51,7 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_listNotEmpty() = mainCoroutineRule.runBlockingTest {
 
-        // emptying the data source
+        // Delete the data source
         dataSource.deleteAllReminders()
         val reminder = ReminderDTO("Title", "Description", "Location", 1.1, 2.2)
         dataSource.saveReminder(reminder)
@@ -76,7 +76,7 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_returnEmptyList() = mainCoroutineRule.runBlockingTest {
 
-        // emptying the data source
+        // Delete the data source
         dataSource.deleteAllReminders()
 
         // WHEN request reminders from data source

@@ -58,7 +58,7 @@ class SaveReminderViewModelTest {
         // clear view model
         saveReminderViewModel.onClear()
 
-        // show that reminderTitle is null
+        // check reminderTitle is null
         MatcherAssert.assertThat(
             saveReminderViewModel.reminderTitle.getOrAwaitValue(),
             CoreMatchers.`is`(CoreMatchers.nullValue())
@@ -70,25 +70,25 @@ class SaveReminderViewModelTest {
             CoreMatchers.`is`(CoreMatchers.nullValue())
         )
 
-        // show that reminderSelectedLocationStr is null
+        // check reminderSelectedLocationStr is null
         MatcherAssert.assertThat(
             saveReminderViewModel.reminderSelectedLocationStr.getOrAwaitValue(),
             CoreMatchers.`is`(CoreMatchers.nullValue())
         )
 
-        // show that selectedPOI is null
+        // check selectedPOI is null
         MatcherAssert.assertThat(
             saveReminderViewModel.selectedPOI.getOrAwaitValue(),
             CoreMatchers.`is`(CoreMatchers.nullValue())
         )
 
-        // show that latitude is null
+        // check latitude is null
         MatcherAssert.assertThat(
             saveReminderViewModel.latitude.getOrAwaitValue(),
             CoreMatchers.`is`(CoreMatchers.nullValue())
         )
 
-        // show that longitude is null
+        // check longitude is null
         MatcherAssert.assertThat(
             saveReminderViewModel.longitude.getOrAwaitValue(),
             CoreMatchers.`is`(CoreMatchers.nullValue())
@@ -103,13 +103,13 @@ class SaveReminderViewModelTest {
         // pass reminder data item to saveReminderViewModel
         saveReminderViewModel.saveReminder(reminder)
 
-        // show that saveReminderViewModel is saved
+        // check saveReminderViewModel is saved
         MatcherAssert.assertThat(
             saveReminderViewModel.showToast.value,
             CoreMatchers.`is`(saveReminderViewModel.app.getString(R.string.reminder_saved))
         )
 
-        // show that NavigationCommand.Back isEquals saveReminderViewModel.navigationCommand value
+        // check NavigationCommand.Back isEquals saveReminderViewModel.navigationCommand value
         Assert.assertEquals(
             saveReminderViewModel.navigationCommand.getOrAwaitValue(),
             NavigationCommand.Back
@@ -124,10 +124,10 @@ class SaveReminderViewModelTest {
         // WHEN validate reminder data
         val validReminder = saveReminderViewModel.validateEnteredData(reminder)
 
-        // show that validReminder is false
+        // check validReminder is false
         MatcherAssert.assertThat(validReminder, CoreMatchers.`is`(false))
 
-        // show that showSnackBarInt is appear message "please enter title"
+        // check showSnackBarInt is appear message "please enter title"
         MatcherAssert.assertThat(
             saveReminderViewModel.showSnackBarInt.getOrAwaitValue(),
             CoreMatchers.`is`(R.string.err_enter_title)
@@ -142,10 +142,10 @@ class SaveReminderViewModelTest {
         // WHEN validate reminder data
         val validReminder = saveReminderViewModel.validateEnteredData(reminder)
 
-        // show that validReminder is false
+        // check validReminder is false
         MatcherAssert.assertThat(validReminder, CoreMatchers.`is`(false))
 
-        // show that showSnackBarInt is appear message "please select location"
+        // check showSnackBarInt is appear message "please select location"
         MatcherAssert.assertThat(
             saveReminderViewModel.showSnackBarInt.value,
             CoreMatchers.`is`(R.string.err_select_location)
@@ -161,14 +161,14 @@ class SaveReminderViewModelTest {
         mainCoroutineRule.pauseDispatcher()
         saveReminderViewModel.saveReminder(reminder)
 
-        // show that showLoading is true
+        // check showLoading is true
         MatcherAssert.assertThat(
             saveReminderViewModel.showLoading.getOrAwaitValue(),
             CoreMatchers.`is`(true)
         )
         mainCoroutineRule.resumeDispatcher()
 
-        // show that showLoading is false
+        // check showLoading is false
         MatcherAssert.assertThat(
             saveReminderViewModel.showLoading.getOrAwaitValue(),
             CoreMatchers.`is`(false)

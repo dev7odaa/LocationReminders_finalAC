@@ -99,10 +99,10 @@ class RemindersLocalRepositoryTest {
         //  reminders are requested from the reminders repository
         val reminders = (remindersRepository.getReminders() as Result.Success).data.sortedBy { it.id }
 
-        // show that reminders is NotNull
+        // check reminders is NotNull
         assertThat(reminders, CoreMatchers.notNullValue())
 
-        // show that reminders is equal reminders in local database
+        // check reminders is equal reminders in local database
         assertThat(reminders, IsEqual(localReminder))
     }
 
@@ -114,7 +114,7 @@ class RemindersLocalRepositoryTest {
         // WHEN reminders are requested from the reminders repository
         val reminders = remindersRepository.getReminders() as Result.Success
 
-        // show that empty reminders list is loaded from local data source is true
+        // check empty reminders list is loaded from local data source is true
         assertThat(reminders.data.isEmpty(), `is`(true))
     }
 
@@ -126,10 +126,10 @@ class RemindersLocalRepositoryTest {
         // request reminder by ID from the reminders repository
         val reminder = remindersRepository.getReminder(reminderId) as Result.Success
 
-        // show that reminder is loaded from local data source is NotNull
+        // check reminder is loaded from local data source is NotNull
         assertThat(reminder.data, CoreMatchers.notNullValue())
 
-        // show that reminder isEqual reminder loaded from local data source
+        // check reminder isEqual reminder loaded from local data source
         assertThat(reminder.data, IsEqual(reminderWithId))
     }
 
@@ -141,7 +141,7 @@ class RemindersLocalRepositoryTest {
         // request reminder by not existing ID from the reminders repository
         val reminder = remindersRepository.getReminder(UUID.randomUUID().toString()) as Result.Error
 
-        // show that reminder message loaded from local data source is "Reminder not found!"
+        // check reminder message loaded from local data source is "Reminder not found!"
         assertThat(reminder.message, `is`("Reminder not found!"))
     }
 
@@ -154,7 +154,7 @@ class RemindersLocalRepositoryTest {
         remindersDao.deleteAllReminders()
         val reminders = remindersRepository.getReminders() as Result.Success
 
-        // show that reminders data is Empty
+        // check reminders data is Empty
         assertThat(reminders.data.isEmpty(), `is`(true))
     }
 }

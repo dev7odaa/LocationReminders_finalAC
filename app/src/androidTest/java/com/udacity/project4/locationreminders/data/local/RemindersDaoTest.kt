@@ -99,7 +99,7 @@ class RemindersDaoTest {
         //  request reminders from database
         var reminders = remindersDao.getReminders()
 
-        // show that reminders.isEmpty is  true
+        // check reminders.isEmpty is  true
         assertThat(reminders.isEmpty(), `is`(true))
     }
 
@@ -111,10 +111,10 @@ class RemindersDaoTest {
         // request reminder by ID from database
         val reminder = remindersDao.getReminderById(reminder1.id)
 
-        // show that reminder is  NotNull
+        // check reminder is  NotNull
         assertThat<ReminderDTO>(reminder as ReminderDTO, notNullValue())
 
-        // show that reminder.id is equal  reminder1.id
+        // check reminder.id is equal  reminder1.id
         assertThat(reminder.id, `is`(reminder1.id))
     }
 
@@ -126,7 +126,7 @@ class RemindersDaoTest {
         // request reminder by not existing ID from database
         val reminder = remindersDao.getReminderById(UUID.randomUUID().toString())
 
-        // show that reminder is null
+        //check  reminder is null
         assertThat(reminder, `is`(CoreMatchers.nullValue()))
     }
 
@@ -139,7 +139,7 @@ class RemindersDaoTest {
         //  request reminders from database
         val reminders = remindersDao.getReminders()
 
-        // show that reminders list is empty in database
+        // check reminders list is empty in database
         assertThat(reminders.isEmpty(), `is`(true))
     }
 }

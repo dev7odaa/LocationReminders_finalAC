@@ -51,7 +51,7 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_listNotEmpty() = mainCoroutineRule.runBlockingTest {
 
-        // GIVEN empty reminders list
+        // emptying the data source
         dataSource.deleteAllReminders()
         val reminder = ReminderDTO("Title", "Description", "Location", 1.1, 2.2)
         dataSource.saveReminder(reminder)
@@ -60,13 +60,13 @@ class RemindersListViewModelTest {
         remindersListViewModel.loadReminders()
 
 
-        // show that remindersList is not empty
+        // check remindersList is not empty
         MatcherAssert.assertThat(
             remindersListViewModel.remindersList.getOrAwaitValue().isNotEmpty(),
             CoreMatchers.`is`(true)
         )
 
-        // show that showNoData is false
+        // check showNoData is false
         MatcherAssert.assertThat(
             remindersListViewModel.showNoData.getOrAwaitValue(),
             CoreMatchers.`is`(false)
@@ -76,19 +76,19 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_returnEmptyList() = mainCoroutineRule.runBlockingTest {
 
-        // GIVEN empty reminders list
+        // emptying the data source
         dataSource.deleteAllReminders()
 
         // WHEN request reminders from data source
         remindersListViewModel.loadReminders()
 
-        // show that remindersList is empty
+        // check remindersList is empty
         MatcherAssert.assertThat(
             remindersListViewModel.remindersList.getOrAwaitValue().isEmpty(),
             CoreMatchers.`is`(true)
         )
 
-        // show that showNoData is true
+        // check showNoData is true
         MatcherAssert.assertThat(
             remindersListViewModel.showNoData.getOrAwaitValue(),
             CoreMatchers.`is`(true)
@@ -104,7 +104,7 @@ class RemindersListViewModelTest {
         // WHEN request reminders from data source
         remindersListViewModel.loadReminders()
 
-        // show that showSnackBar value is Returning testing error!
+        // check showSnackBar value is Returning testing error!
         MatcherAssert.assertThat(
             remindersListViewModel.showSnackBar.getOrAwaitValue(),
             CoreMatchers.`is`("Returning testing error!")

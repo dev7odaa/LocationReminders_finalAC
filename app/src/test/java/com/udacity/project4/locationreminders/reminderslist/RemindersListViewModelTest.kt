@@ -98,10 +98,6 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_returnError() = mainCoroutineRule.runBlockingTest {
 
-        // Why do we have the data source return an error? maybe there no data saved local
-        // What kind of error is it? Reminders not found!
-        // What scenario are we trying to cover by doing this? load reminders but it empty
-
         // assure that data source return error
         dataSource.setReturnError(true)
 

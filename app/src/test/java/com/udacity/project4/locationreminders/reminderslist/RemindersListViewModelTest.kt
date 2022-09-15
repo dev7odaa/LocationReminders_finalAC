@@ -100,6 +100,10 @@ class RemindersListViewModelTest {
 
     @Test
     fun checkError() {
+        // test application reacts appropriately when there's an error
+        // (such as data being unavailable from the network).
+        //  a boolean flag called setReturnError and set it initially to false which means that by default an error is not returned.
+
         dataSource.setReturnError(true)
 
         viewModel.loadReminders()

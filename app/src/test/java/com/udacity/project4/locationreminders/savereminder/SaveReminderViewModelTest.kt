@@ -35,12 +35,15 @@ class SaveReminderViewModelTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
+    // Executes each task synchronously using Architecture Components.
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setupViewModel() {
+        // Initialise the data source with no reminders.
         dataSource = FakeDataSource()
+        // Initialize the view model
         viewModel = SaveReminderViewModel(
             ApplicationProvider.getApplicationContext(),
             dataSource
@@ -54,6 +57,7 @@ class SaveReminderViewModelTest {
 
     @Test
     fun saveReminderTest() = runBlocking {
+        // GIVEN a reminder item
         val reminder = ReminderDataItem(
             "title",
             "description",
@@ -61,6 +65,7 @@ class SaveReminderViewModelTest {
             latitude = 47.5456551,
             longitude = 122.0101731
         )
+        // WHEN request save reminder from view model
         viewModel.saveReminder(reminder)
 
         //Assert validation when all data available  Toast Shows "Reminder Saved !"
@@ -69,6 +74,7 @@ class SaveReminderViewModelTest {
 
     @Test
     fun validateAndSaveReminderTest_valid_returnTrue() = runBlocking {
+        // GIVEN a reminder item
         val reminder = ReminderDataItem(
             "title",
             "description",
@@ -76,6 +82,7 @@ class SaveReminderViewModelTest {
             latitude = 47.5456551,
             longitude = 122.0101731
         )
+        // WHEN request save reminder from view model
         val result = viewModel.validateEnteredData(reminder)
 
         //Assert validation when all data available return true
@@ -85,6 +92,7 @@ class SaveReminderViewModelTest {
 
     @Test
     fun validateAndSaveReminderTest_emptyTitle_returnFalse() = runBlocking {
+        // GIVEN a reminder item without title
         val reminder = ReminderDataItem(
             "",
             "description",
@@ -92,6 +100,7 @@ class SaveReminderViewModelTest {
             latitude = 47.5456551,
             longitude = 122.0101731
         )
+        // WHEN validate reminder data
         val result = viewModel.validateEnteredData(reminder)
 
         //Assert validation when no title return false
@@ -100,6 +109,7 @@ class SaveReminderViewModelTest {
 
     @Test
     fun validateAndSaveReminderTest_emptyLocation_returnFalse() = runBlocking {
+        // GIVEN a reminder item without location
         val reminder = ReminderDataItem(
             "title",
             "description",
@@ -107,6 +117,7 @@ class SaveReminderViewModelTest {
             latitude = 47.5456551,
             longitude = 122.0101731
         )
+        // WHEN validate reminder data
         val result = viewModel.validateEnteredData(reminder)
 
         //Assert validation when no location return false
@@ -115,6 +126,7 @@ class SaveReminderViewModelTest {
 
     @Test
     fun validateAndSaveReminderTest_emptyTitleAndLocation_returnFalse() = runBlocking {
+        // GIVEN a reminder item without title and location
         val reminder = ReminderDataItem(
             "",
             "description",
@@ -122,6 +134,7 @@ class SaveReminderViewModelTest {
             latitude = 47.5456551,
             longitude = 122.0101731
         )
+        // WHEN validate reminder data
         val result = viewModel.validateEnteredData(reminder)
 
         //Assert validation when no title & no location return false
@@ -132,6 +145,7 @@ class SaveReminderViewModelTest {
     fun checkLoading() {
         mainCoroutineRule.pauseDispatcher()
 
+        // GIVEN a reminder item
         val reminder = ReminderDataItem(
             "",
             "description",
@@ -139,6 +153,8 @@ class SaveReminderViewModelTest {
             latitude = 47.5456551,
             longitude = 122.0101731
         )
+
+        // WHEN request save reminder from view model
         viewModel.saveReminder(reminder)
 
         //Assert showLoading is true

@@ -17,9 +17,10 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf())
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
         // get all reminders
 
-        // if we need to test it with error handling if data source return empty or not.
+        // if we need to test it with error handling.
         // i make data source return error even if not empty to test error.
         // for the network I talk generally and our app not contain any network.
+        // the error could be something with the db
 
         if(shouldReturnError) {
             return Result.Error("Returning testing error!")

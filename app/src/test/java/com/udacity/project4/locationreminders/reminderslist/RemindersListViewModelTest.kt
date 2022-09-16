@@ -110,7 +110,7 @@ class RemindersListViewModelTest {
     @Test
     fun checkError() {
         // test application reacts appropriately when there's an error
-        // (such as data being unavailable from the network).
+        // (such as data being unavailable).
         // a boolean flag called setReturnError and set it initially to false which means that by default an error is not returned.
 
         // GIVEN empty reminders list

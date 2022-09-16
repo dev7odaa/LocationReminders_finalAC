@@ -18,6 +18,7 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf())
         // get all reminders
 
         // if we need to test it with error handling if data source return empty or not.
+        // i make data source return error even if not empty to test error.
         // for the network I talk generally and our app not contain any network.
 
         if(shouldReturnError) {

@@ -113,7 +113,7 @@ class RemindersListViewModelTest {
         // (such as data being unavailable).
         // a boolean flag called setReturnError and set it initially to false which means that by default an error is not returned.
 
-        // GIVEN empty reminders list
+        // setting the error flag to true
         dataSource.setReturnError(true)
 
         // WHEN request reminders from data source

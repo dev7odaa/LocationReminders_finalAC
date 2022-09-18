@@ -5,15 +5,22 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.location.LocationManager
+import android.media.audiofx.BassBoost
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -32,16 +39,21 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import kotlinx.coroutines.NonCancellable.cancel
 import org.koin.android.ext.android.inject
+import java.util.*
 
-class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
+class SelectLocationFragment : BaseFragment() {
 
     private val REQUEST_CODE_BACKGROUND = 102929
     private val REQUEST_TURN_DEVICE_LOCATION_ON = 12433
     private val TAG = "SelectLocation"
 
     private lateinit var mMap: GoogleMap
+    private lateinit var pointOfInterest: PointOfInterest
     private val REQUEST_LOCATION_PERMISSION = 1111111111
+
+    private var locPermission: Boolean = false
 
     var Poi : PointOfInterest? =null
     var lat : Double = 0.0
@@ -65,13 +77,7 @@ class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
-//        TODO: add the map setup implementation
-//        TODO: zoom to the user location after taking his permission
-//        TODO: add style to the map
-//        TODO: put a marker to location that the user selected
+        onMapReady()
 
 
         binding.saveLocation.setOnClickListener{
@@ -81,45 +87,54 @@ class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
         return binding.root
     }
 
-    private fun onLocationSelected() {
-        _viewModel.latitude.value = lat
-        _viewModel.longitude.value = long
-        _viewModel.selectedPOI.value = Poi
-        _viewModel.reminderSelectedLocationStr.value = title
-        _viewModel.navigationCommand.postValue(NavigationCommand.Back)
+
+    private fun checkDeviceLocationSettings(resolve: Boolean = true) {
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+        val requestBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val locationSettingsResponseTask =
+            settingsClient.checkLocationSettings(requestBuilder.build())
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException && resolve) {
+                try {
+                    exception.startResolutionForResult(
+                        requireActivity(),
+                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    )
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
+                }
+            } else {
+                Snackbar.make(
+                    requireView(),
+                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                ).setAction(android.R.string.ok) {
+                    checkDeviceLocationSettings()
+                }.show()
+            }
+
+        }
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.map_options, menu)
-    }
+    private fun onMapReady() {
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.normal_map -> {
-            mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-            true
-        }
-        R.id.hybrid_map -> {
-            mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
-            true
-        }
-        R.id.satellite_map -> {
-            mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
-            true
-        }
-        R.id.terrain_map -> {
-            mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
-    }
+        mapFragment.getMapAsync{
 
-    override fun onMapReady(googleMap: GoogleMap?) {
-        mMap = googleMap!!
+            mMap = it
+            if(locPermission == false){
+                enableMyLocation()
+                onMapReady()
+            }else{
+                setPoiClick(mMap)
+                setMapStyle(mMap)
+                setOnMapClick(mMap)
+            }
 
-        setPoiClick(mMap)
-        setMapStyle(mMap)
-        enableMyLocation()
+        }
     }
 
     private fun setPoiClick(map: GoogleMap) {
@@ -161,52 +176,23 @@ class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
         }
     }
 
-
-    private fun isPermissionGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_BACKGROUND) {
-            checkDeviceLocationSettings()
-        }
-    }
-
-    private fun checkDeviceLocationSettings(resolve: Boolean = true) {
-        val locationRequest = LocationRequest.create().apply {
-            priority = LocationRequest.PRIORITY_LOW_POWER
-        }
-        val requestBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val settingsClient = LocationServices.getSettingsClient(requireActivity())
-        val locationSettingsResponseTask =
-            settingsClient.checkLocationSettings(requestBuilder.build())
-        locationSettingsResponseTask.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException && resolve) {
-                try {
-                    exception.startResolutionForResult(
-                        requireActivity(),
-                        REQUEST_TURN_DEVICE_LOCATION_ON
-                    )
-                } catch (sendEx: IntentSender.SendIntentException) {
-                    Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
-                }
-            } else {
-                Snackbar.make(
-                    requireView(),
-                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
-                ).setAction(android.R.string.ok) {
-                    checkDeviceLocationSettings()
-                }.show()
-            }
+    private fun setOnMapClick(map: GoogleMap) {
+        map.setOnMapClickListener { latLng ->
+            map.clear()
+            val snippet = String.format(
+                Locale.getDefault(),
+                getString(R.string.lat_long_snippet),
+                latLng.latitude,
+                latLng.longitude
+            )
+            pointOfInterest = PointOfInterest(latLng, "", getString(R.string.dropped_pin))
+            val poi = pointOfInterest
+            map.addMarker(
+                MarkerOptions()
+                    .position(poi.latLng)
+                    .title(poi.name)
+                    .snippet(snippet)
+            )?.showInfoWindow()
 
         }
     }
@@ -220,17 +206,14 @@ class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
             } else {
                 requestQPermission()
             }
-
+            locPermission = true
         } else {
             ActivityCompat.requestPermissions(
                 context as Activity,
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_LOCATION_PERMISSION
             )
         }
-        //        DONE: zoom to the user location after taking his permission
-
-
         mMap.moveCamera(CameraUpdateFactory.zoomIn())
     }
 
@@ -256,6 +239,64 @@ class SelectLocationFragment : BaseFragment() , OnMapReadyCallback{
                 )
             }
         }
+    }
+
+    private fun isPermissionGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun onLocationSelected() {
+        _viewModel.latitude.value = lat
+        _viewModel.longitude.value = long
+        _viewModel.selectedPOI.value = Poi
+        _viewModel.reminderSelectedLocationStr.value = title
+        _viewModel.navigationCommand.postValue(NavigationCommand.Back)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onResume() {
+        super.onResume()
+        if (isPermissionGranted())
+            if (::mMap.isInitialized)
+                mMap.isMyLocationEnabled = true
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_BACKGROUND) {
+            checkDeviceLocationSettings()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.map_options, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.normal_map -> {
+            mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+            true
+        }
+        R.id.hybrid_map -> {
+            mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+            true
+        }
+        R.id.satellite_map -> {
+            mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            true
+        }
+        R.id.terrain_map -> {
+            mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
 }

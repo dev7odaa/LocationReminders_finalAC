@@ -85,7 +85,7 @@ class RemindersLocalRepositoryTest {
             RemindersDatabase::class.java
         ).build()
         remindersDao = remindersDatabase.reminderDao()
-        remindersRepository = RemindersLocalRepository(remindersDao, Dispatchers.Main)
+        remindersRepository = RemindersLocalRepository(remindersDao, Dispatchers.Unconfined)
     }
 
     @After

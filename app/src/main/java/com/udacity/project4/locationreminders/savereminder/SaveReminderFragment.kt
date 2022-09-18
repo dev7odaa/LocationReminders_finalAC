@@ -14,6 +14,7 @@ import androidx.navigation.findNavController
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -63,6 +64,9 @@ class SaveReminderFragment : BaseFragment() {
             _viewModel.navigationCommand.value =
                 NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
         }
+
+        geofencingClient = LocationServices.getGeofencingClient(requireActivity())
+        geofenceHelper = GeofenceHelper(requireActivity())
 
         binding.saveReminder.setOnClickListener {
             val title = _viewModel.reminderTitle.value

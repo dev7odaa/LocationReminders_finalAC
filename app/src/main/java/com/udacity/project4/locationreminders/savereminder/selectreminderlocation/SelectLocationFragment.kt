@@ -55,7 +55,6 @@ class SelectLocationFragment : BaseFragment() {
 
     private var locPermission: Boolean = false
 
-    var Poi : PointOfInterest? =null
     var lat : Double = 0.0
     var long : Double = 0.0
     var title = ""
@@ -147,7 +146,7 @@ class SelectLocationFragment : BaseFragment() {
             val zoomLevel = 15f
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, zoomLevel))
             poiMarker?.showInfoWindow()
-            Poi = poi
+            pointOfInterest = poi
             lat= poi.latLng.latitude
             long = poi.latLng.longitude
             title = poi.name
@@ -197,6 +196,7 @@ class SelectLocationFragment : BaseFragment() {
         }
     }
 
+
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         if (isPermissionGranted()) {
@@ -216,6 +216,7 @@ class SelectLocationFragment : BaseFragment() {
         }
         mMap.moveCamera(CameraUpdateFactory.zoomIn())
     }
+
 
     @TargetApi(Build.VERSION_CODES.Q)
     private fun requestQPermission() {
@@ -249,10 +250,10 @@ class SelectLocationFragment : BaseFragment() {
     }
 
     private fun onLocationSelected() {
-        _viewModel.latitude.value = lat
-        _viewModel.longitude.value = long
-        _viewModel.selectedPOI.value = Poi
-        _viewModel.reminderSelectedLocationStr.value = title
+        _viewModel.latitude.value = pointOfInterest.latLng.latitude
+        _viewModel.longitude.value = pointOfInterest.latLng.longitude
+        _viewModel.selectedPOI.value = pointOfInterest
+        _viewModel.reminderSelectedLocationStr.value = pointOfInterest.name
         _viewModel.navigationCommand.postValue(NavigationCommand.Back)
     }
 

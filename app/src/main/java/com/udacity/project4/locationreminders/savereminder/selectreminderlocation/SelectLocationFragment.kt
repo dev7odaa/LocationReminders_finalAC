@@ -186,7 +186,7 @@ class SelectLocationFragment : BaseFragment() {
             } else {
                 Snackbar.make(
                     binding.root,
-                    R.string.permission_denied_explanation, Snackbar.LENGTH_INDEFINITE
+                    R.string.permission_denied_explanation, Snackbar.LENGTH_SHORT
                 )
                     .setAction(R.string.settings) {
                         // Displays App settings screen.

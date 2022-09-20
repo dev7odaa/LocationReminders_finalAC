@@ -27,8 +27,10 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO> = mutableListOf()) 
             return Result.Error("Returning testing error!")
         }
 
+        //as you order. when no reminders are found,
+        // Room simply returns an empty list and the data source actually returns Result.Success
         if (reminders.isEmpty()) {
-            return Result.Error("no reminders are found")
+            return Result.Success(reminders)
         } else {
             return Result.Success(reminders)
         }

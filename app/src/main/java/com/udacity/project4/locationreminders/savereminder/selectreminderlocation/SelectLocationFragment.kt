@@ -129,7 +129,6 @@ class SelectLocationFragment : BaseFragment() {
         }
     }
 
-
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         if (isPermissionGranted()) {

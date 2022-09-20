@@ -1,7 +1,10 @@
 package com.udacity.project4.locationreminders.savereminder
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.app.PendingIntent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -9,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import com.google.android.gms.location.Geofence
@@ -30,6 +34,8 @@ import java.util.*
 
 class SaveReminderFragment : BaseFragment() {
     private val TAG = "SaveReminderFragment"
+    private val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
+    private val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
 
     //Get the view model this time as a single to be shared with the another fragment
     override val _viewModel: SaveReminderViewModel by inject()
@@ -40,6 +46,7 @@ class SaveReminderFragment : BaseFragment() {
     private lateinit var geofenceHelper: GeofenceHelper
     private lateinit var geofencingClient: GeofencingClient
 
+    private val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,8 +84,15 @@ class SaveReminderFragment : BaseFragment() {
             val geofenceId = UUID.randomUUID().toString()
 
 
-            if (latitude != null && longitude != null && !TextUtils.isEmpty(title))
-                addGeofence(LatLng(latitude, longitude), GEOFENCE_RADIUS, geofenceId)
+            //Device location and required permissions checked or properly handled right before adding a geofence
+            if (latitude != null && longitude != null && !TextUtils.isEmpty(title)){
+                if (foregroundAndBackgroundLocationPermissionApproved()) {
+                    addGeofence(LatLng(latitude, longitude), GEOFENCE_RADIUS, geofenceId)
+                } else {
+                    requestForegroundAndBackgroundLocationPermissions()
+                }
+            }
+
 
             _viewModel.validateAndSaveReminder(ReminderDataItem(title,description,location, latitude,longitude))
 
@@ -121,5 +135,43 @@ class SaveReminderFragment : BaseFragment() {
                 Toast.makeText(context, "Please give background location permission", Toast.LENGTH_LONG).show()
                 Log.d(TAG, "fail in creating geofence: $errorMessage")
             })
+    }
+
+    @TargetApi(29)
+    private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
+        val foregroundLocationApproved = (
+                PackageManager.PERMISSION_GRANTED ==
+                        ActivityCompat.checkSelfPermission(requireContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ))
+        val backgroundPermissionApproved =
+            if (runningQOrLater) {
+                PackageManager.PERMISSION_GRANTED ==
+                        ActivityCompat.checkSelfPermission(
+                            requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        )
+            } else {
+                true
+            }
+        return foregroundLocationApproved && backgroundPermissionApproved
+    }
+
+    @TargetApi(29)
+    private fun requestForegroundAndBackgroundLocationPermissions() {
+        if (foregroundAndBackgroundLocationPermissionApproved())
+            return
+        var permissionsArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        val resultCode = when {
+            runningQOrLater -> {
+                permissionsArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
+            }
+            else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
+        }
+        Log.d("foregroundCheck", "Request foreground only location permission")
+        requestPermissions(
+            permissionsArray,
+            resultCode
+        )
     }
 }

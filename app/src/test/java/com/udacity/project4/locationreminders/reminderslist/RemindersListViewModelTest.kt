@@ -124,6 +124,6 @@ class RemindersListViewModelTest {
         viewModel.loadReminders()
 
         // Assert showSnackbar value is Returning data is not found
-        assertEquals("data is not found",viewModel.showSnackBar.getOrAwaitValue())
+        assertEquals("Returning testing error!",viewModel.showSnackBar.getOrAwaitValue())
     }
 }

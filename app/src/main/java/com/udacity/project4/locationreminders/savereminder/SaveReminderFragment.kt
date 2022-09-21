@@ -137,7 +137,7 @@ class SaveReminderFragment : BaseFragment() {
 
             geofencingClient.addGeofences(geofencingRequest, pendingIntent)?.run{
                 addOnSuccessListener {
-
+                    _viewModel.navigationCommand.value = NavigationCommand.Back
                     Log.d(TAG, "Geofence Added")
                 }
                 .addOnFailureListener {

@@ -135,18 +135,17 @@ class SaveReminderFragment : BaseFragment() {
 
             val pendingIntent: PendingIntent? = geofenceHelper.getGeofencePendingIntent()
 
-            geofencingClient.addGeofences(geofencingRequest, pendingIntent)
-                .addOnSuccessListener(OnSuccessListener<Void?> {
-                    // Toast.makeText(context,"geofence added",Toast.LENGTH_LONG).show()
+            geofencingClient.addGeofences(geofencingRequest, pendingIntent)?.run{
+                addOnSuccessListener {
+
                     Log.d(TAG, "Geofence Added")
-                })
-                .addOnFailureListener(OnFailureListener { e ->
-                    val errorMessage: String = geofenceHelper.getErrorString(e)
+                }
+                .addOnFailureListener {
+                    val errorMessage: String = "Failed to add location!!! Try again later!"
                     Toast.makeText(context, "Please give background location permission", Toast.LENGTH_LONG).show()
                     checkDeviceLocationSettingsAndStartGeofence()
-                })
-
-
+                }
+            }
         }
     }
 

@@ -17,6 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.udacity.project4.MainAndroidTestCoroutineRule
 import com.udacity.project4.R
+import com.udacity.project4.locationremiders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
@@ -44,7 +45,7 @@ import org.mockito.Mockito.verify
 class ReminderListFragmentTest {
 
     private lateinit var appContext: Application
-    private lateinit var dataSource: ReminderDataSource
+    private lateinit var dataSource: FakeDataSource
 
     @get: Rule
     val mainCoroutineRule = MainAndroidTestCoroutineRule()
@@ -54,6 +55,7 @@ class ReminderListFragmentTest {
 
     @Before
     fun setup() {
+        dataSource = FakeDataSource()
         // stop the original app koin
         stopKoin()
 

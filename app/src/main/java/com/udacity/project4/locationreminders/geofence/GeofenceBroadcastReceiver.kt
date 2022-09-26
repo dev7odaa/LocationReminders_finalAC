@@ -1,13 +1,8 @@
 package com.udacity.project4.locationreminders.geofence
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.GeofencingEvent
-
 /**
  * Triggered by the Geofence.  Since we can have many Geofences at once, we pull the request
  * ID from the first Geofence, and locate it within the cached data in our Room DB
@@ -19,22 +14,15 @@ import com.google.android.gms.location.GeofencingEvent
  */
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
-    private val TAG = "GeofenceBroadcastReceiver"
+    companion object {
+        const val ACTION_GEOFENCE_EVENT =
+            "locationreminders.geofence.action.ACTION_GEOFENCE_EVENT"
+    }
 
-    @SuppressLint("LongLogTag")
     override fun onReceive(context: Context, intent: Intent) {
 
-        val geofenceEvent = GeofencingEvent.fromIntent(intent)
-        if (geofenceEvent.hasError()) {
-            Log.d(TAG, "Error on receive")
-            return
+        if(intent.action == ACTION_GEOFENCE_EVENT) {
+            GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
         }
-
-        when (geofenceEvent.geofenceTransition) {
-            Geofence.GEOFENCE_TRANSITION_ENTER -> {
-                GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
-            }
-        }
-
     }
 }

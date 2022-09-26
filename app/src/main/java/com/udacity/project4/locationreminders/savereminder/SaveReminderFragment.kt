@@ -166,8 +166,7 @@ class SaveReminderFragment : BaseFragment() {
             (requestCode == FINE_AND_BACKGROUND_LOCATIONS_REQUEST_CODE &&
                     grantedResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)
         ) {
-
-            _viewModel.showSnackBarInt.value = R.string.permission_denied_explanation
+            _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
 
         } else {
 

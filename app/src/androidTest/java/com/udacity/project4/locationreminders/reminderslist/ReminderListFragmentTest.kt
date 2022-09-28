@@ -118,27 +118,6 @@ class ReminderListFragmentTest {
         verify(navController).navigate(ReminderListFragmentDirections.toSaveReminder())
     }
 
-    /**
-     * Test the displayed data on the UI.
-     */
-    @Test
-    fun reminderList_displayRemindersDataInUI() {
-
-        // GIVEN a list of reminders
-        runBlocking {
-            dataSource.saveReminder(reminder1)
-        }
-
-        // WHEN on the reminder list screen
-        launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-
-        // THEN reminders are displayed on the screen
-        onView(withId(R.id.reminderssRecyclerView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(withId(R.id.reminderssRecyclerView))
-            .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(reminder1.title))))
-            .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(reminder1.description))))
-            .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(reminder1.location))))
-    }
 
     /**
      * Add testing for the error messages.

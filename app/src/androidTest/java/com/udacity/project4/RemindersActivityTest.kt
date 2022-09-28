@@ -118,8 +118,9 @@ class RemindersActivityTest :
     fun reminderActivity_addReminder_endToEnd() {
 
         // Start up reminders screen
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        var activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
+
 
         // Verify No Data is displayed
         Espresso.onView(ViewMatchers.withId(R.id.noDataTextView))
@@ -169,47 +170,11 @@ class RemindersActivityTest :
     }
 
 
-
-    //Espresso tests for Toast messages
-    @Test
-    fun saveReminderScreen_showToastMessage() {
-
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-
-        Espresso.onView(ViewMatchers.withId(R.id.noDataTextView))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(ViewMatchers.withId(R.id.addReminderFAB)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.reminderTitle))
-            .perform(ViewActions.replaceText("title"))
-        Espresso.onView(ViewMatchers.withId(R.id.reminderDescription))
-            .perform(ViewActions.replaceText("description"))
-        Espresso.onView(ViewMatchers.withId(R.id.selectLocation)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.map)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.save_location)).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withId(R.id.saveReminder)).perform(ViewActions.click())
-
-        Espresso.onView(ViewMatchers.withText(R.string.reminder_saved)).inRoot(
-            RootMatchers.withDecorView(
-                CoreMatchers.not(CoreMatchers.`is`(getActivity(activityScenario).window.decorView)))
-        ).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-
-        activityScenario.close()
-    }
-
-    private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity {
-        lateinit var activity: Activity
-        activityScenario.onActivity {
-            activity = it
-        }
-        return activity
-    }
-
     //A Snackbar message is supposed to be displayed when the reminder title is empty (save reminder screen).
     @Test
     fun saveReminderScreen_showSnackBarTitleError() {
 
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        var activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         Espresso.onView(ViewMatchers.withId(R.id.addReminderFAB)).perform(ViewActions.click())
@@ -225,7 +190,7 @@ class RemindersActivityTest :
     @Test
     fun saveReminderScreen_showSnackBarLocationError() {
 
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        var activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         Espresso.onView(ViewMatchers.withId(R.id.addReminderFAB)).perform(ViewActions.click())

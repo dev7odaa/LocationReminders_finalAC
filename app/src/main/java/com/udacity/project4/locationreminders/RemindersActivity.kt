@@ -22,16 +22,11 @@ import kotlinx.android.synthetic.main.activity_reminders.*
 class RemindersActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityRemindersBinding
-    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this,R.layout.activity_reminders)
-        val navController = this.findNavController(R.id.nav_host_fragment)
-        NavigationUI.setupActionBarWithNavController(this, navController)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

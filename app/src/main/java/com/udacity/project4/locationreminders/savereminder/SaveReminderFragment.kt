@@ -155,6 +155,7 @@ class SaveReminderFragment : BaseFragment() {
         return foregroundLocationApproved && backgroundPermissionApproved
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -164,13 +165,16 @@ class SaveReminderFragment : BaseFragment() {
         if (grantedResults.isEmpty()) {
             _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
 
-        } else if ( grantedResults[FINE_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
-            (requestCode == FINE_AND_BACKGROUND_LOCATIONS_REQUEST_CODE ||
-                    grantedResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)){
-
-        } else {
-            checkDeviceLocationSettingsAndStartGeofence()
+        } else if (
+            grantedResults[FINE_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED &&
+            grantedResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED
+            ){
+            _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
+        } else{
+            fineAndBackgroundLocationPermissionsApproved()
         }
+        checkDeviceLocationSettingsAndStartGeofence()
+
     }
 
 

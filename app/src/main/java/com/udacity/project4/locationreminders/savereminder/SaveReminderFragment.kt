@@ -161,15 +161,14 @@ class SaveReminderFragment : BaseFragment() {
         grantedResults: IntArray) {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantedResults)
-        if (grantedResults.isEmpty() ||
-            grantedResults[FINE_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
-            (requestCode == FINE_AND_BACKGROUND_LOCATIONS_REQUEST_CODE &&
-                    grantedResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)
-        ) {
+        if (grantedResults.isEmpty()) {
             _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
 
-        } else {
+        } else if ( grantedResults[FINE_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
+            (requestCode == FINE_AND_BACKGROUND_LOCATIONS_REQUEST_CODE ||
+                    grantedResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)){
 
+        } else {
             checkDeviceLocationSettingsAndStartGeofence()
         }
     }

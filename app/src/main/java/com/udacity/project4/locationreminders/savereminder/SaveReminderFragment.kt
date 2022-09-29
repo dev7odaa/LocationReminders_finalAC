@@ -8,8 +8,10 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +25,7 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
+import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
@@ -43,8 +46,6 @@ class SaveReminderFragment : BaseFragment() {
 
         private const val FINE_LOCATION_PERMISSION_INDEX = 0
         private const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
-
-        private const val GEOFENCE_RADIUS_IN_METERS = 100f
     }
 
     //Get the view model this time as a single to be shared with the another fragment
@@ -158,23 +159,33 @@ class SaveReminderFragment : BaseFragment() {
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<String>,
-        grantedResults: IntArray) {
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Log.d(TAG, "onRequestPermissionResult")
 
-        super.onRequestPermissionsResult(requestCode, permissions, grantedResults)
-        if (grantedResults.isEmpty()) {
-            _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
+        if (
+            grantResults.isEmpty() ||
+            grantResults[FINE_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
+            (requestCode == FINE_LOCATION_REQUEST_CODE && grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)
+        ) {
 
-        } else if (
-            grantedResults[FINE_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED &&
-            grantedResults[BACKGROUND_LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED
-            ){
-            _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
-        } else{
-            fineAndBackgroundLocationPermissionsApproved()
+            Snackbar.make(
+                binding.root,
+                R.string.permission_denied_explanation,
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction(R.string.settings) {
+                    startActivity(Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                }.show()
+        } else {
+
+            checkDeviceLocationSettingsAndStartGeofence()
         }
-        checkDeviceLocationSettingsAndStartGeofence()
-
     }
 
 

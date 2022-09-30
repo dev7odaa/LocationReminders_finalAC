@@ -39,7 +39,7 @@ class SelectLocationFragment : BaseFragment() {
     private lateinit var pointOfInterest: PointOfInterest
 
     companion object {
-        private const val REQUEST_LOCATION_PERMISSION = 1
+        const val REQUEST_LOCATION_PERMISSION = 1
     }
 
     override fun onCreateView(

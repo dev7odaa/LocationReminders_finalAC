@@ -167,7 +167,7 @@ class SaveReminderFragment : BaseFragment() {
         // location data layer.
         if (requestCode == SelectLocationFragment.REQUEST_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                _viewModel.showSnackBarInt.value = R.string.permission_denied_explanation
+                checkDeviceLocationSettingsAndStartGeofence()
 
             } else {
                 Snackbar.make(
@@ -183,7 +183,7 @@ class SaveReminderFragment : BaseFragment() {
                         })
                     }.show()
             }
-            checkDeviceLocationSettingsAndStartGeofence()
+
         }
     }
 

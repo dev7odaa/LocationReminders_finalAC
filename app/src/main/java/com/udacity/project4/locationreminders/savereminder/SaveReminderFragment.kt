@@ -159,31 +159,31 @@ class SaveReminderFragment : BaseFragment() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<String>,
+        permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // Check if location permissions are granted and if so enable the
-        // location data layer.
-        if (requestCode == SelectLocationFragment.REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                checkDeviceLocationSettingsAndStartGeofence()
+        if (
+            grantResults.isEmpty() ||
+            grantResults[0] == PackageManager.PERMISSION_DENIED ||
+            (requestCode == FINE_LOCATION_REQUEST_CODE &&
+                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
+                    PackageManager.PERMISSION_DENIED)
+        ) {
 
-            } else {
-                Snackbar.make(
-                    binding.root,
-                    R.string.permission_denied_explanation, Snackbar.LENGTH_SHORT
-                )
-                    .setAction(R.string.settings) {
-                        // Displays App settings screen.
-                        startActivity(Intent().apply {
-                            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        })
-                    }.show()
-            }
-
+            Snackbar.make(
+                binding.root,
+                R.string.permission_denied_explanation,
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction(R.string.settings) {
+                    startActivity(Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                }.show()
+        } else {
+            checkDeviceLocationSettingsAndStartGeofence()
         }
     }
 
@@ -242,14 +242,11 @@ class SaveReminderFragment : BaseFragment() {
                 _viewModel.saveReminder(reminderDataItem)
                 Log.d(TAG, "Geofence Added")
             }
-            .addOnFailureListener {
-                _viewModel.showSnackBarInt.value = R.string.error_adding_geofence
-            }
+                .addOnFailureListener {
+                    _viewModel.showSnackBarInt.value = R.string.error_adding_geofence
+                }
         }
     }
-
-
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

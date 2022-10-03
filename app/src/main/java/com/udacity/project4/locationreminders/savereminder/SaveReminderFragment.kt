@@ -243,7 +243,8 @@ class SaveReminderFragment : BaseFragment() {
                 Log.d(TAG, "Geofence Added")
             }
                 .addOnFailureListener {
-                    _viewModel.showSnackBarInt.value = R.string.error_adding_geofence
+                    Toast.makeText(context,R.string.error_adding_geofence,Toast.LENGTH_SHORT).show()
+                    _viewModel.saveReminder(reminderDataItem)
                 }
         }
     }

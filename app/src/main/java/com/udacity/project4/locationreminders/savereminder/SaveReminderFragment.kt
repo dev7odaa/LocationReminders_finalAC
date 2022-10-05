@@ -183,7 +183,7 @@ class SaveReminderFragment : BaseFragment() {
                     })
                 }.show()
         } else {
-            checkDeviceLocationSettingsAndStartGeofence()
+            checkDeviceLocationSettingsAndStartGeofence(true)
         }
     }
 
@@ -205,12 +205,7 @@ class SaveReminderFragment : BaseFragment() {
                     Log.d(ContentValues.TAG, "Error getting location settings resolution: " + sendEx.message)
                 }
             } else {
-                Snackbar.make(
-                    requireView(),
-                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
-                ).setAction(android.R.string.ok) {
-                    checkDeviceLocationSettingsAndStartGeofence()
-                }.show()
+                checkDeviceLocationSettingsAndStartGeofence(true)
             }
         }
 

@@ -175,11 +175,12 @@ class SaveReminderFragment : BaseFragment() {
         geofenceClient.addGeofences(geofenceRequest, geofencePendingIntent).run {
             addOnSuccessListener {
                 Log.d(TAG, "addGeofenceForReminder: ${geofence?.requestId}")
-
+                _viewModel.showSnackBar.value = "Geofence added"
             }
             addOnFailureListener {
                 if (it.message != null) {
                     Log.d(TAG, "Failed To add geofence: ${it.message}")
+                    _viewModel.showSnackBar.value = "Error To Add Geofence"
                 }
             }
         }

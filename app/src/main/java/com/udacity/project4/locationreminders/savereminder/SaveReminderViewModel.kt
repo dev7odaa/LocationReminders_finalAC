@@ -63,7 +63,6 @@ class SaveReminderViewModel(val app: Application, private val dataSource: Remind
             )
             showLoading.value = false
             showToast.value = app.getString(R.string.reminder_saved)
-            showSnackBar.value = "Geofence added"
             navigationCommand.value = NavigationCommand.Back
 
         }

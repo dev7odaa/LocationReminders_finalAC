@@ -7,6 +7,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import org.hamcrest.CoreMatchers.not
 import androidx.test.espresso.action.ViewActions.click
@@ -24,6 +25,8 @@ import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.util.DataBindingIdlingResource
+import com.udacity.project4.util.monitorFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -133,6 +136,6 @@ class ReminderListFragmentTest {
         launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
 
         // THEN "No Data" is displayed on the screen
-        onView(withId(R.id.noDataTextView)).check(ViewAssertions.matches(not(isDisplayed())))
+        onView(ViewMatchers.withText(R.string.no_data)).check(ViewAssertions.matches(isDisplayed()))
     }
 }

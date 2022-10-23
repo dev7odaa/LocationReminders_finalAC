@@ -13,8 +13,7 @@ import org.hamcrest.CoreMatchers.not
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.MediumTest
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.udacity.project4.MainAndroidTestCoroutineRule
@@ -136,6 +135,7 @@ class ReminderListFragmentTest {
         launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
 
         // THEN "No Data" is displayed on the screen
-        onView(ViewMatchers.withText(R.string.no_data)).check(ViewAssertions.matches(isDisplayed()))
+        onView(withText(R.string.no_data)).check(ViewAssertions.matches(not(isCompletelyDisplayed())))
+
     }
 }
